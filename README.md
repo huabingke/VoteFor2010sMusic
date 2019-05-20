@@ -1,6 +1,11 @@
 # VoteFor2010sMusic
 Vote for your favourite artist and song of 2010s
 
+Yu Huang         21888709
+Xuelin Wang      21820158
+
+
+
 
 backup design：
 flask and flask-restplus 
