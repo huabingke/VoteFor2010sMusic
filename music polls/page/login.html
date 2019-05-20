@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<title>Login</title>
+		<meta name="renderer" content="webkit">
+		<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=0">
+		<link rel="stylesheet" href="../lib/layui-v2.4.5/layui/css/layui.css" media="all">
+		<link rel="stylesheet" href="../lib/font-awesome-4.7.0/css/font-awesome.min.css">
+		<link rel="stylesheet" href="../css/layuiadmin/admin.css" media="all">
+		<link rel="stylesheet" href="../css/layuiadmin/login.css" media="all">
+		<script src="../lib/layui-v2.4.5/layui/layui.js?t=1554901097999" charset="utf-8"></script>
+		<script type="text/javascript" src="../js/jquery.min.js" data-main="js/main"></script>
+	</head>
+	<body>
+
+		<div class="layadmin-user-login layadmin-user-display-show" id="LAY-user-login" style="display: none;">
+
+			<div class="layadmin-user-login-main">
+				<div class="layadmin-user-login-box layadmin-user-login-header">
+					<h2>Music Poll</h2>
+					<p>Edit by : </p>
+				</div>
+				<form class="layui-form" action="" target="nm_iframe">
+					<div class="layadmin-user-login-box layadmin-user-login-body layui-form">
+						<div class="layui-form-item">
+							<label class="layadmin-user-login-icon layui-icon layui-icon-username" for="LAY-user-login-username"></label>
+							<input type="text" name="username" id="username" lay-verify="account" placeholder="User Name"
+							 class="layui-input">
+						</div>
+						<div class="layui-form-item">
+							<label class="layadmin-user-login-icon layui-icon layui-icon-password" for="LAY-user-login-password"></label>
+							<input type="password" name="password" id="password" lay-verify="pass" placeholder="Password"
+							 class="layui-input">
+						</div>
+						<div class="layui-form-item">
+							<button class="layui-btn layui-btn-fluid" lay-submit lay-filter="login-submit">Sign in</button>
+						</div>
+						<div class="layui-trans layui-form-item layadmin-user-login-other">
+
+							<a href="reg.html" class="layadmin-user-jump-change layadmin-link">Register</a>
+						</div>
+					</div>
+				</form>
+			</div>
+
+		</div>
+
+		<script>
+			layui.use(['form', 'layedit', 'laydate'], function() {
+				var form = layui.form,
+					layer = layui.layer,
+					layedit = layui.layedit,
+					laydate = layui.laydate;
+
+				//date
+				laydate.render({
+					elem: '#date'
+				});
+				laydate.render({
+					elem: '#date1'
+				});
+
+
+				
+				form.verify({
+					account: function(value) {
+						if (value.length == 0) {
+							return 'Account can not be empty !';
+						}
+					},
+					pass: function(value) {
+						if (value.length == 0) {
+							return 'Password can not be empty !';
+						}
+					}
+				});
+
+				
+				form.on('submit(login-submit)', function(data) {
+					console.log(JSON.stringify(data.field));
+					event.preventDefault();
+					
+					$.ajax({
+						url:"http://127.0.0.1:5000/login",
+						type:"POST",
+						contentType: "application/json",
+						data: JSON.stringify({
+								  "user_name": $("#username").val(),
+								  "password": $("#password").val()
+								}),
+						success:function(obj){
+							if(obj.code != 0){
+								alert(obj.msg);
+							}else{
+								window.location.href='home.html?username='+$("#username").val();
+							}
+							
+					},
+						dataType: 'json'
+					});
+					
+					return false;
+				});
+
+			});
+		</script>
+	</body>
+</html>

@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<title>Edit Poll</title>
+		<meta name="renderer" content="webkit">
+		<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=0">
+		<link rel="stylesheet" href="../lib/layui-v2.4.5/layui/css/layui.css" media="all">
+		<link rel="stylesheet" href="../css/layuiadmin/admin.css" media="all">
+		<link rel="stylesheet" href="../css/layuiadmin/login.css" media="all">
+		<script type="text/javascript" src="../js/jquery.min.js" data-main="js/main"></script>
+		<script src="../lib/layui-v2.4.5/layui/layui.js?t=1554901097999" charset="utf-8"></script>
+	</head>
+	<body class="layui-layout-body">
+		<div class="layui-col-md12">
+			<div class="layui-btn-group" style="margin-top: 5px;">
+				<button class="layui-btn layui-btn-primary layui-btn-sm" onclick="openadd()"><i class="layui-icon"></i></button>
+				<!-- <button class="layui-btn layui-btn-primary layui-btn-sm" onclick="openedit()"><i class="layui-icon"></i></button> -->
+				<button class="layui-btn layui-btn-primary layui-btn-sm" onclick="deletepoll()"><i class="layui-icon"></i></button>
+			</div>
+			<table class="layui-hide" id="poll"></table>
+		</div>
+
+		<div class="layadmin-user-login-box layadmin-user-login-body layui-form" id="pollform" style="display: none;padding: 10px;">
+			<div class="layui-form-item">
+				<input type="text" name="user_name" id="user_name" lay-verify="account" placeholder="User Name" class="layui-input">
+			</div>
+			<div class="layui-form-item">
+				<input type="password" name="password" id="password" lay-verify="account" placeholder="Password"  class="layui-input">
+			</div>
+			<div class="layui-form-item">
+				<select name="sex" id="sex" lay-verify="account" lay-search="">
+				  <option value="">Please select sex...</option>
+				  <option value="0">Male</option>
+				  <option value="1">Female</option>
+				</select>
+			</div>
+		</div>
+
+		<script>
+			function openadd() {
+				layer.open({
+					title: " ",
+					area: ['500px', '500px'],
+					type: 1,
+					offset: 1 //：http://www.layui.com/doc/modules/layer.html#offset
+						,
+					id: 'layerDemo' + 1 
+						,
+					content: $('#pollform'),
+					btn: 'Save',
+					btnAlign: 'c' 
+						,
+					shade: 0 
+						,
+					yes: function() {
+						if ($("#user_name").val().length == 0) {
+							alert('User Name can not be empty !');
+							return;
+						}
+						if ($("#password").val().length == 0) {
+							alert('Password can not be empty !');
+							return;
+						}
+						if ($("#sex").val().length == 0) {
+							alert('Sex can not be empty !');
+							return;
+						}
+						$.ajax({
+							url: "http://127.0.0.1:5000/admin/user",
+							type: "POST",
+							contentType: "application/json",
+							data: JSON.stringify({
+								"user_name": $("#user_name").val(),
+								"password": $("#password").val(),
+								"sex": $("#sex").val()
+							}),
+							success: function(obj) {
+								if (obj.code != 0) {
+									alert(obj.msg);
+								} else {
+									tableRender();
+									layer.closeAll();
+								}
+
+							},
+							dataType: 'json'
+						});
+
+					}
+				});
+			}
+
+			function deletepoll() {
+				var checkStatus = table.checkStatus('poll');
+				if (checkStatus.data.length != 1) {
+					alert('Only choose one !');
+					return;
+				}
+				var data = checkStatus.data[0];
+				$.ajax({
+					url: "http://127.0.0.1:5000/admin/user",
+					type: "Delete",
+					contentType: "application/json",
+					data: JSON.stringify({
+						"id": data.id
+					}),
+					success: function(obj) {
+						if (obj.code != 0) {
+							alert(obj.msg);
+						} else {
+							alert("Delete Success!");
+							tableRender();
+						}
+
+					},
+					dataType: 'json'
+				});
+			}
+
+			function openedit() {
+				var checkStatus = table.checkStatus('poll');
+				if (checkStatus.data.length != 1) {
+					alert('Only choose one !');
+					return;
+				}
+				var data = checkStatus.data[0];
+				$("#poll_name").val(data.name);
+				$("#options").val(data.options);
+				layer.open({
+					title: " ",
+					area: ['500px', '500px'],
+					type: 1,
+					offset: 1 //http://www.layui.com/doc/modules/layer.html#offset
+						,
+					id: 'layerDemo' + 2 
+						,
+					content: $('#pollform'),
+					btn: 'Save',
+					btnAlign: 'c' 
+						,
+					shade: 0 
+						,
+					yes: function() {
+						if ($("#poll_name").val().length == 0) {
+							alert('Poll Name can not be empty !');
+							return;
+						}
+						if ($("#options").val().length == 0) {
+							alert('Poll Options can not be empty !');
+							return;
+						}
+						$.ajax({
+							url: "http://127.0.0.1:5000/admin/poll",
+							type: "POST",
+							contentType: "application/json",
+							data: JSON.stringify({
+								"poll_name": $("#poll_name").val(),
+								"options": $("#options").val()
+							}),
+							success: function(obj) {
+								if (obj.code != 0) {
+									alert(obj.msg);
+								} else {
+									layer.closeAll();
+								}
+
+							},
+							dataType: 'json'
+						});
+					}
+				});
+			}
+			
+			function tableRender(){
+				table.render({
+					elem: '#poll',
+					url: 'http://127.0.0.1:5000/admin/user',
+					cellMinWidth: 80 
+						,
+					cols: [
+						[{
+								type: 'checkbox'
+							},
+							{
+								field: 'id',
+								width: '30%',
+								title: 'ID',
+								sort: true
+							}, {
+								field: 'name',
+								width: '30%',
+								title: 'User Name'
+							}, {
+								field: 'sex',
+								width: '30%',
+								title: 'Sex'
+							}
+						]
+					],
+					parseData: function(res) { 
+						var data = res.data;
+						var item = [];
+						for (var i = 0; i < data.length; i++) {
+							var user = data[i];
+							item.push({
+								"id": user.id,
+								"name": user.name,
+								"sex": (user.sex==0?'Male':'Female')
+							});
+						}
+						return {
+							"code": res.code, 
+							"msg": res.msg, 
+							"count": res.data.length, 
+							"data": item 
+						};
+					}
+				});
+			}
+
+			layui.use('layer', function() { 
+				var $ = layui.jquery,
+					layer = layui.layer; 
+			});
+
+			var table;
+			layui.use('table', function() {
+				table = layui.table;
+				tableRender();
+			});
+		</script>
+	</body>
+</html>

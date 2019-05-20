@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html style="height: 100%">
+	<head>
+		<meta charset="utf-8">
+		<title>Home</title>
+		<style>
+			.BMap_cpyCtrl {
+            display: none;
+        }
+
+        .anchorBL {
+            display: none;
+        }
+    </style>
+		<link rel="stylesheet" href="../lib/layui-v2.4.5/layui/css/layui.css" media="all">
+		<link rel="stylesheet" href="../lib/font-awesome-4.7.0/css/font-awesome.min.css">
+		<script src="../lib/layui-v2.4.5/layui/layui.js?t=1554901097999" charset="utf-8"></script>
+		<script src="../js/echarts.min.js"></script>
+		<script src="../js/poll.js"></script>
+		<script type="text/javascript" src="../js/jquery.min.js" data-main="js/main"></script>
+	</head>
+	<body style="margin: 0;">
+		<div class="layui-col-md12" style="text-align: center;">
+			<button class="layui-btn layui-btn-lg layui-btn-radius layui-btn-warm" onclick="submitpoll()">Submit</button>
+		</div>
+		<script type="text/javascript">
+			function cleanpoll(){
+				$(".fa-thumbs-up").attr("class","fa fa-thumbs-o-up");
+				$(".fa-thumbs-o-up").css("color","#555");
+			}
+			function poll(obj){
+				if("fa fa-thumbs-o-up" == $(obj).children()[0].className){
+					$($(obj).children()[0]).attr("class","fa fa-thumbs-up");
+					$($(obj).children()[0]).css("color","#FFB800");
+				}else{
+					$($(obj).children()[0]).attr("class","fa fa-thumbs-o-up");
+					$($(obj).children()[0]).css("color","#555");
+				}
+			}
+			
+			function submitpoll(){
+				var issuccess = true;
+				var msg = "";
+				$(".fa-thumbs-up").each(function(){
+					$.ajax({
+						url:"http://127.0.0.1:5000/poll",
+						type:"POST",
+						async: false,
+						contentType: "application/json",
+						dataType: 'json',
+						data: JSON.stringify({
+											  "poll_id": $($(this).parent()[0]).attr("poll_id"),
+											  "select_id": $($(this).parent()[0]).attr("select_id"),
+											  "user_name": window.parent.username
+											}),
+						success:function(obj){
+							if(obj.code != 0){
+								issuccess = false;
+							}else{
+								msg = msg +  obj.msg + "; " ;
+							}
+					}
+					});
+				  });
+				  if(issuccess){
+					  alert("poll success!");
+				  }else{
+					  alert(msg);
+				  }
+			}
+			
+			$.ajax({
+				url:"http://127.0.0.1:5000/poll",
+				type:"get",
+				data: {},
+				success:function(obj){
+					var data = obj.data;
+				if(data && data.length>0){
+					for ( var i = 0; i < data.length; i++) {
+						var poll = data[i];
+						var html = 
+						'<fieldset class="layui-elem-field site-demo-button" style="margin-top: 10px;" >'+
+						'	<legend>'+poll.name+'</legend>'+
+						'<div style="padding: 10px; background-color: #F2F2F2;">'+
+						'	<div class="layui-row layui-col-space15">';
+						for ( var j= 0; j < poll.options.length; j++) {
+							var option = poll.options[j];
+							html = html + 
+							'	<div class="layui-col-md4">'+
+							'		<div class="layui-card">'+
+							'			<div class="layui-card-body">'+
+							'				<blockquote class="layui-elem-quote">'+
+							option.des+
+							'				</blockquote>'+
+							'			</div>'+
+							'			<div class="layui-card-header" style="text-align: center;margin-top: -10px;">'+
+							'			 	<button class="layui-btn layui-btn-primary" style="border: 0px solid #C9C9C9;" poll_id="'+poll.id+'" select_id="'+option.id+'" onclick="poll(this)"><i class="fa fa-thumbs-o-up" style="font-size: 24px;" aria-hidden="true"></i></button>'+
+							'			</div>'+
+							'		</div>'+
+							'</div>';
+						}
+						html = html +
+						'	</div>'+
+						'	</div>'+
+						'</fieldset>';
+						
+						$("body").prepend(html);
+					}
+				}
+			},
+				dataType: 'json'
+			});
+
+			layui.use(['element', 'layer'], function() {
+				var element = layui.element;
+				var layer = layui.layer;
+
+				element.on('collapse(test)', function(data) {
+					layer.msg('expand status：' + data.show);
+				});
+			});
+		</script>
+	</body>
+</html>

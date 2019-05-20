@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <title>Home</title>
+  <meta name="renderer" content="webkit">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black"> 
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="format-detection" content="telephone=no">
+  
+  <link rel="stylesheet" href="../lib/layui-v2.4.5/layui/css/layui.css"  media="all">
+  <script src="../lib/layui-v2.4.5/layui/layui.js?t=1554901097999" charset="utf-8"></script>
+	<script type="text/javascript" src="../js/jquery.min.js" data-main="js/main"></script>
+<script>
+	layui.use('element', function(){
+	  var element = layui.element; 
+	});
+	function goto(url){
+		$("#bodyiframe").attr("src",url);
+	}
+	function logout(){
+		window.location.href='login.html';
+	}
+	
+	(function ($) {
+		$.getUrlParam = function (name) {
+		 var reg = new RegExp("(^|&)" + name + "=([^&]*)(&|$)");
+		 var r = window.location.search.substr(1).match(reg);
+		 if (r != null) return unescape(r[2]); return null;
+		}
+	 })(jQuery);
+ 
+	var username ;
+	 $(document).ready(function(){
+		username = $.getUrlParam('username');
+		$("#username").text(username);
+			if(username!='admin'){
+				$("#management").remove();
+			}
+	});
+ 
+</script>
+</head>
+<body class="layui-layout-body">
+<div class="layui-layout layui-layout-admin">
+  <div class="layui-header">
+		<div class="layui-logo layui-bg-green" style="font-size: 20px;">Music Poll</div>
+    <ul class="layui-nav layui-bg-green" lay-filter="demo" style="margin-left: 150px;">
+      <li class="layui-nav-item"><a href="javascript:void(0);" onclick="goto('poll.html')">Poll</a></li>
+      <li class="layui-nav-item"><a href="javascript:void(0);" onclick="goto('view.html')">View</a></li>
+      <li class="layui-nav-item" id="management">
+				<a href="javascript:void(0);">Management</a>
+				<dl class="layui-nav-child">
+          <dd><a href="javascript:void(0);" onclick="goto('editPoll.html')">Edit poll</a></dd>
+          <dd><a href="javascript:void(0);" onclick="goto('editUser.html')">Edit User</a></dd>
+        </dl>
+			</li>
+    </ul>
+    <ul class="layui-nav layui-layout-right">
+      <li class="layui-nav-item">
+        <a href="javascript:;">
+          <img src="../image/u1.jpg" class="layui-nav-img">
+          <span id="username"></span>
+        </a>
+      </li>
+      <li class="layui-nav-item"><a href="javascript:void(0);" onclick="logout()">Logout</a></li>
+    </ul>
+  </div>
+  
+  
+  <div class="layui-body" style="left: 0px;">
+    <iframe id="bodyiframe" src="poll.html" width="100%" height="98%" style="border: #009F95 0px;"></iframe>
+  </div>
+  
+  <div class="layui-footer" style="left: 0px;">
+   Yu Huang&Xuelin Wang，1.00
+  </div>
+</div>
+
+</body>
+</html>
